@@ -1,26 +1,45 @@
-export function getValues(
+const valueReducer = (format = String) => (accumulator, { value, dataset }) => {
+  accumulator[Number(dataset.n)] = format(value);
+  return accumulator;
+};
+
+export function getStructure(
   form,
-  initNumberClassName,
-  actionClassName,
-  numberClassName
+  { initNumberClass, actionClass, numberClass }
 ) {
-  const inputs = form.elements;
+  const fields = form.elements;
   const result = {
+    initNumber: null,
     actions: [],
-    numbers: [],
+    numbers: []
   };
 
-  for (let i = 0; i < inputs.length; i++) {
-    if (inputs[i].classList.contains(initNumberClassName)) {
-      continue; // skip initial
+  for (let i = 0; i < fields.length; i++) {
+    if (fields[i].classList.contains(initNumberClass)) {
+      result.initNumber = fields[i];
     }
-    if (inputs[i].classList.contains(numberClassName)) {
-      result.actions.push(inputs[i]);
+    if (fields[i].classList.contains(actionClass)) {
+      result.actions.push(fields[i]);
     }
-    if (inputs[i].classList.contains(numberClassName)) {
-      result.numbers.push(inputs[i]);
+    if (fields[i].classList.contains(numberClass)) {
+      result.numbers.push(fields[i]);
     }
   }
 
   return result;
+}
+
+export function getModel({ actions, numbers }) {
+  const actionValues = actions.reduce(valueReducer(), []);
+  const numberValues = numbers.reduce(valueReducer(Number), []);
+  return actionValues
+    .map((action, index) => ({
+      action,
+      number: numberValues[index]
+    }))
+    .filter(Boolean);
+}
+
+export function calculateResult(form) {
+  console.log('CALCULATE', form);
 }
