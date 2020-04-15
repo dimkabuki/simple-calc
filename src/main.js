@@ -1,4 +1,4 @@
-// import { calculateResult } from './model';
+import { calculateResult } from './utils';
 import { validateForm } from './validation';
 
 const INIT_NUMBER_CLASS = 'js-init-number';
@@ -18,21 +18,33 @@ const elements = {
   result: document.querySelector(`.${RESULT_CLASS}`)
 };
 
+const structureClasses = {
+  initNumberClass: INIT_NUMBER_CLASS,
+  actionClass: ACTION_CLASS,
+  numberClass: NUMBER_CLASS
+};
+
 elements.form.addEventListener('submit', event => {
   event.preventDefault();
 
-  console.log('START VALIDATION');
-
-  const isValid = validateForm(
+  const validation = validateForm(
     elements.form,
     ['html', 'structure', 'isNumbers', 'divisionByZero'],
-    {
-      initNumberClass: INIT_NUMBER_CLASS,
-      actionClass: ACTION_CLASS,
-      numberClass: NUMBER_CLASS
-    }
+    structureClasses
   );
-  console.log('RESULT', isValid);
+
+  if (validation && validation.message) {
+    elements.result.classList.add('text-red-500');
+    elements.result.textContent = validation.message;
+    return;
+  }
+
+  elements.result.classList.remove('text-red-500');
+  const result = calculateResult(elements.form, structureClasses);
+  const displayResult = Number(
+    Math.abs(result) % 2 === 0 ? result : result.toFixed(3)
+  );
+  elements.result.textContent = `Result is: ${displayResult}`;
 });
 
 // TODO: implement validation for controls on change

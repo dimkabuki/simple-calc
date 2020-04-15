@@ -1,7 +1,17 @@
+const operations = {
+  add: (a, b) => a + b,
+  subtract: (a, b) => a - b,
+  multiply: (a, b) => a * b,
+  divide: (a, b) => a / b
+};
+
 const valueReducer = (format = String) => (accumulator, { value, dataset }) => {
   accumulator[Number(dataset.n)] = format(value);
   return accumulator;
 };
+
+const resultReducer = (accumulator, { action, number }) =>
+  operations[action](accumulator, number);
 
 export function getStructure(
   form,
@@ -40,6 +50,8 @@ export function getModel({ actions, numbers }) {
     .filter(Boolean);
 }
 
-export function calculateResult(form) {
-  console.log('CALCULATE', form);
+export function calculateResult(form, structureClasses) {
+  const structure = getStructure(form, structureClasses);
+  const model = getModel(structure);
+  return model.reduce(resultReducer, Number(structure.initNumber.value));
 }

@@ -13,8 +13,8 @@ const datasetIsNumber = ({ dataset }, dataKey = 'n') =>
 
 const validations = {
   html: form => (form.checkValidity() ? null : errors.html),
-  structure: (form, classes) => {
-    const { actions, numbers } = getStructure(form, classes);
+  structure: (form, structureClasses) => {
+    const { actions, numbers } = getStructure(form, structureClasses);
     return !!actions &&
       !!numbers &&
       actions.length === numbers.length &&
@@ -23,14 +23,14 @@ const validations = {
       ? null
       : errors.structure;
   },
-  isNumbers: (form, classes) => {
-    const { numbers } = getStructure(form, classes);
+  isNumbers: (form, structureClasses) => {
+    const { numbers } = getStructure(form, structureClasses);
     return !!numbers && numbers.every(({ value }) => !isNaN(Number(value)))
       ? null
       : errors.isNumbers;
   },
-  divisionByZero: (form, classes) => {
-    const model = getModel(getStructure(form, classes));
+  divisionByZero: (form, structureClasses) => {
+    const model = getModel(getStructure(form, structureClasses));
     return model.some(
       ({ action, number }) => action === 'divide' && number === 0
     )
@@ -39,11 +39,11 @@ const validations = {
   }
 };
 
-export function validateForm(form, validationsList = [], classes) {
+export function validateForm(form, validationsList = [], structureClasses) {
   for (let i = 0; i < validationsList.length; i++) {
     const key = validationsList[i];
     if (typeof validations[key] === 'function') {
-      const message = validations[key](form, classes);
+      const message = validations[key](form, structureClasses);
       if (message) {
         return { message };
       }
